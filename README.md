@@ -5,7 +5,7 @@ As part of the MSU.AI course (2025), a model predicting daily fluxes of relativi
 
 The initial data are downloaded from the site of the MSU Space Weather Center https://swx.sinp.msu.ru/.
 
-The raw data files are available in the folder [data](https://github.com/azragorskayaCG/Pred_el_GEO_for_MSU.AI/tree/main/data), splited into 3 subfolders with distinct types of data:
+The raw data files are available in the folder [data](https://github.com/azragorskayaCG/Pred_el_GEO_for_MSU.AI/tree/main/data), split into 3 subfolders with distinct types of data:
 - [files_geomag_indices](https://github.com/azragorskayaCG/Pred_el_GEO_for_MSU.AI/tree/main/data/files_geomag_indices) contains  geomagnetic indices, listed in the following order: ``` AE-index, AU-index, AL-index, AO-index, ASY/H, SYM/D, SYM/H, ASY/D, Kp ```
 - [files_solar_wind](https://github.com/azragorskayaCG/Pred_el_GEO_for_MSU.AI/tree/main/data/files_solar_wind) contains the solar wind parameters, listed in the following order: ```proton density, Solar wind synamic pressure, Bulk speed, Ion tempeture, GSM B_x, GSM B_y, GSM B_z, GSM B_t ```
 - [files_flux_and_others](https://github.com/azragorskayaCG/Pred_el_GEO_for_MSU.AI/tree/main/data/files_flux_and_others) contains the flux and magnetosphere parameters, listed in the following order: ``` E >0.8 MeV, E >2.0 MeV, Hp, He, Hn, B, Rss(Shue) ```

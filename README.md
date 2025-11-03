@@ -20,14 +20,14 @@ The script is available in the folder [scripts/processing](https://github.com/az
 
 See details in ```scripts/processing/README.md ```.
 
-## Classic machine learning
+## Classical machine learning
 
-The first developed model is based on gradient boosting method of [classic machine learning](https://github.com/azragorskayaCG/Pred_el_GEO_for_MSU.AI/tree/main/scripts/classicML). Three algorithms were used:
+The first developed model is based on gradient boosting method of [classical machine learning](https://github.com/azragorskayaCG/Pred_el_GEO_for_MSU.AI/tree/main/scripts/classicalML). Three algorithms were used:
 -  ```CatBoost  ```
 -  ```LightGBM  ```
 -  ```XGBoost  ```
 
-For details, see ```scripts/classicML/README.md ```.
+For details, see ```scripts/classicalML/README.md ```.
 
 ## Neural networks
 

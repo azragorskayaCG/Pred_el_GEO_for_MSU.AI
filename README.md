@@ -14,3 +14,6 @@ Each file contains 2 months of data with an hourly resolution.
 
 ## Processing
 
+Before training the data are processed.
+The output contains one file of each parameters in daily resolution.
+The script is available in the folder [scripts/processing/Processing](https://github.com/azragorskayaCG/Pred_el_GEO_for_MSU.AI/tree/main/scripts/processing).

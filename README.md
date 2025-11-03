@@ -22,15 +22,15 @@ See details in ```scripts/processing/README.md ```.
 
 ## Classical machine learning
 
-The first developed model is based on gradient boosting method of [classical machine learning](https://github.com/azragorskayaCG/Pred_el_GEO_for_MSU.AI/tree/main/scripts/classicalML). Three algorithms were used:
+The first developed model is based on gradient boosting method of classical machine learning. Three algorithms were used:
 -  ```CatBoost  ```
 -  ```LightGBM  ```
 -  ```XGBoost  ```
 
-For details, see ```scripts/classicalML/README.md ```.
+See the script in the folder [scripts/classicalML](https://github.com/azragorskayaCG/Pred_el_GEO_for_MSU.AI/tree/main/scripts/classicalML), read ```scripts/classicalML/README.md ``` for more information.
 
 ## Neural networks
 
-A second model based on [LSTM neural network](https://github.com/azragorskayaCG/Pred_el_GEO_for_MSU.AI/tree/main/scripts/NeuralNetwork) was developed.
+A second model based on LSTM neural network was developed.
 
-For details, see ```scripts/NeuralNetwork/README.md ```.
+See the script in the folder [scripts/NeuralNetwork](https://github.com/azragorskayaCG/Pred_el_GEO_for_MSU.AI/tree/main/scripts/NeuralNetwork) and read ```scripts/NeuralNetwork/README.md ``` for more information.

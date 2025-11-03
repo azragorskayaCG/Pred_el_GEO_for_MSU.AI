@@ -3,7 +3,7 @@ As part of the MSU.AI course (2025), a model predicting daily fluxes of relativi
 
 ## Data
 
-The initial data are downloaded from the site of the MSU Space Weather Center https://swx.sinp.msu.ru/.
+The initial data are downloaded from the website of the MSU Space Weather Center https://swx.sinp.msu.ru/ as time series data.
 
 The raw data files are available in the folder [data](https://github.com/azragorskayaCG/Pred_el_GEO_for_MSU.AI/tree/main/data), split into 3 subfolders with distinct types of data:
 - [files_geomag_indices](https://github.com/azragorskayaCG/Pred_el_GEO_for_MSU.AI/tree/main/data/files_geomag_indices) contains  geomagnetic indices, listed in the following order: ``` AE-index, AU-index, AL-index, AO-index, ASY/H, SYM/D, SYM/H, ASY/D, Kp ```
@@ -14,6 +14,18 @@ Each file contains 2 months of data with an hourly resolution.
 
 ## Processing
 
-Before training the data are processed.
-The output contains one file of each parameters in daily resolution.
+Before training, the data are processed. The output consists of one file with all the parameters in daily resolution, with filled missing data.
+
 The script is available in the folder [scripts/processing](https://github.com/azragorskayaCG/Pred_el_GEO_for_MSU.AI/tree/main/scripts/processing).
+
+See details in ```scripts/processing/README.md ```.
+
+## Classic machine learning
+
+
+
+## Neural networks
+
+A [neural network model](https://github.com/azragorskayaCG/Pred_el_GEO_for_MSU.AI/tree/main/scripts/NeuralNetwork) based on LSTM was developed.
+
+For details, see ```scripts/NeuralNetwork/README.md ```.

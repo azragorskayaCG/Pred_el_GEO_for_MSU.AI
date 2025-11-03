@@ -22,7 +22,12 @@ See details in ```scripts/processing/README.md ```.
 
 ## Classic machine learning
 
+The first developed model is based on gradient boosting method of [classic machine learning](https://github.com/azragorskayaCG/Pred_el_GEO_for_MSU.AI/tree/main/scripts/classicML). Three algorithms were used:
+-  ```CatBoost  ```
+-  ```LightGBM  ```
+-  ```XGBoost  ```
 
+For details, see ```scripts/classicML/README.md ```.
 
 ## Neural networks
 

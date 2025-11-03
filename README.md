@@ -31,6 +31,6 @@ For details, see ```scripts/classicalML/README.md ```.
 
 ## Neural networks
 
-A [neural network model](https://github.com/azragorskayaCG/Pred_el_GEO_for_MSU.AI/tree/main/scripts/NeuralNetwork) based on LSTM was developed.
+A second model based on [LSTM neural network](https://github.com/azragorskayaCG/Pred_el_GEO_for_MSU.AI/tree/main/scripts/NeuralNetwork) was developed.
 
 For details, see ```scripts/NeuralNetwork/README.md ```.

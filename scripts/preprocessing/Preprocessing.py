@@ -104,27 +104,6 @@ class Preprocessing():
      
         
         return data_imputed
-   
-    def standardization(self):
-        
-        data = self.predict_more_than_n()
-        
-        scaler = MinMaxScaler()
-    
-        data_train = data.copy()[:int(len(data)*0.8)].iloc[:, :-1] #Divide into train data
-        data_test = data.copy()[int(len(data)*0.8):].iloc[:, :-1]  #Divide into test data
-    
-        data_train_standard = pd.DataFrame(scaler.fit_transform(data_train), columns = data.columns[:-1], index=data_train.index)
-        data_test_standard = pd.DataFrame(scaler.transform(data_test), columns = data.columns[:-1], index=data_test.index)
-    
-        # flux_index = data_train.columns.get_loc('flux')  # get integer index of 'flux' column
-        # min_flux = scaler.data_min_[flux_index]
-        # max_flux = scaler.data_max_[flux_index]
 
-        standardized_data = pd.concat([data_train_standard, data_test_standard]).sort_index()
-    
-        standardized_data['time'] =  data.iloc[:, -1]
-    
-        return standardized_data
 
 

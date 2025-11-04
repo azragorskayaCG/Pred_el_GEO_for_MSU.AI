@@ -12,13 +12,13 @@ The raw data files are available in the folder [data](https://github.com/azragor
 
 Each file contains 2 months of data with an hourly resolution.
 
-## Processing
+## Preprocessing
 
-Before training, the data are processed. The output consists of one file with all the parameters in daily resolution, with filled missing data.
+Before training, the data are preprocessed. The output consists of one file with all the parameters in daily resolution, with filled missing data.
 
 The script is available in the folder [scripts/processing](https://github.com/azragorskayaCG/Pred_el_GEO_for_MSU.AI/tree/main/scripts/processing).
 
-See details in ```scripts/processing/README.md ```.
+See details in ```scripts/preprocessing/README.md ```.
 
 ## Classical machine learning
 

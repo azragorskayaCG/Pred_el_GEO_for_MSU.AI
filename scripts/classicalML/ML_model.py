@@ -38,6 +38,20 @@ def set_seed(seed=42):
 set_seed(42)
 
 def predictions(data):
+    """
+    Script for training classical machine learning models, structured into the following steps: 
+    - Data preparation 
+    - Data splitting (train, validation, test)
+    - Model defintion
+    - Training and prediction
+    - Evaluation
+    
+    Parameters
+    -----------
+    data: pd.DataFrame containing all parameters with daily resolution.
+    """
+    
+    #Data preparation
     data = data.copy()
     data['time'] = pd.to_datetime(data['time'].str.slice(0, 10))
     data.set_index('time', inplace=True)
@@ -65,17 +79,15 @@ def predictions(data):
     
     x = data[lag_cols]
     y = data[['target_day_1', 'target_day_2', 'target_day_3']]
-    
+
     time_steps = 2
     
-    # Divide into train/val/test
+    # Data splitting
     x_train, x_val_test, y_train, y_valtest = train_test_split(x, y, test_size = 0.3, shuffle = False)
     x_val, x_test, y_val, y_test = train_test_split(x_val_test, y_valtest, test_size = 0.5, shuffle = False)
     
-    # # Model
+    # Model defintion
     
-    # targets = ['target_day_1', 'target_day_2', 'target_day_3']
-
     # CatBoost model
     model_base = CatBoostRegressor(
         verbose=0,
@@ -107,17 +119,18 @@ def predictions(data):
     
     model = MultiOutputRegressor(model_base)
     
-        # Fit the model
+    # Training and prediction
+    #Train
     model.fit(x_train, y_train)
     
     # Save the history
     
     histories = []
 
-    # Predicted values
+    # Predict values
     y_pred = model.predict(x_test)
 
-    # Efficiency of the prediction
+    # Evaluation
     pe_all = []
     for h in range(3):
         pe_all.append(r2_score(y_test.iloc[:, h], pd.DataFrame(y_pred).iloc[:, h]))
@@ -128,11 +141,16 @@ def predictions(data):
     return pd.DataFrame(y_pred), pe_all, y_test, test_index, model, histories, x_test
 
 # ==============
+# FIGURES
 # ==============
 
-# PLOT THE RESULTS
+# Dataset and target analysis
 
 def matrix_corr(data):
+    """
+    Plot the correlation matrix of the dataset
+    """
+    
     # Calculate the correlation matrix
     cols_to_use_all = ['Vsw', 'P', 'kp', 'E08', 'rss', 'iontemp', 'He', 'bz', 'bt']
     others = sorted(cols_to_use_all)
@@ -150,32 +168,12 @@ def matrix_corr(data):
     # plt.savefig(f'/Users/clemence/Documents/Аспирантура_наука/1. Работа/2. Нейронные сети/NeuralNetwork/Figures/Models/ML_model/corr_matrix_{method}.png', dpi = 600, bbox_inches = 'tight')
     
     plt.show()
-    
-# =============
 
-def predictions_n_days_r2():
-    plt.scatter(np.arange(1, len(pe)+1), [0.89, 0.71, 0.53], label = f'LSTM        0.89, 0.71, 0.53', color = 'green')
-    plt.plot(np.arange(1, len(pe)+1), [0.89, 0.71, 0.53], color = 'green', linestyle = '--')
-    plt.scatter(np.arange(1, len(pe)+1), [0.86, 0.69, 0.52], label = f'CatBoost  0.86, 0.69, 0.52', color = 'dodgerblue')
-    plt.plot(np.arange(1, len(pe)+1), [0.86, 0.69, 0.52], color = 'dodgerblue')
-    plt.scatter(np.arange(1, len(pe)+1), [0.85, 0.68, 0.50], label = f'LightGBM 0.85, 0.68, 0.50', color = 'orange')
-    plt.plot(np.arange(1, len(pe)+1), [0.85, 0.68, 0.50], color = 'orange')
-    plt.scatter(np.arange(1, len(pe)+1), [0.83, 0.64, 0.46], label = f'XGBoost   0.83, 0.64, 0.46', color = 'darkred')
-    plt.plot(np.arange(1, len(pe)+1), [0.83, 0.64, 0.46], color = 'darkred')
-
-    # plt.scatter(np.arange(1, len(pe)+1), pe, label = f'{pe[0]:.2f}, {pe[1]:.2f}, {pe[2]:.2f}')
-    # plt.plot(np.arange(1, len(pe)+1), pe)
-    
-    # plt.yticks(np.arange(0.45, 0.95, 0.1))
-    plt.xticks(np.arange(1, 4))
-    plt.xlabel('День прогнозирования')
-    plt.ylabel('R²')
-    # plt.title('')
-    plt.legend(loc = 'upper right', fontsize = 11)
-    # plt.savefig('/Users/clemence/Documents/Аспирантура_наука/1. Работа/2. Нейронные сети/NeuralNetwork/Figures/Article_presentation/r2.png', dpi = 600, bbox_inches = 'tight')
-    plt.show()
-    
 def event_supp_8(data):
+    """
+    Plot the time series of the target and the number of events exceeding the threshold
+    """
+    
     fig, axs = plt.subplots(2, 1, sharex = True, gridspec_kw={'hspace': 0, 'wspace': 0.05}) #row, col
     fig.set_figwidth(10) 
     fig.set_figheight(8) 
@@ -186,7 +184,6 @@ def event_supp_8(data):
     data_for_plot['year'] = data_for_plot['time'].str.slice(0,4)
     data_for_plot = data_for_plot[data_for_plot['flux']>8]
     year_sup_8 = data_for_plot.groupby('year').size()
-    
     
     ax1.plot(data.index, data['flux'], color = 'royalblue')
     ax1.axhline(y=8, xmin=0, xmax=1, color = 'darkred', linestyle = '--', linewidth = 3)
@@ -207,6 +204,9 @@ def event_supp_8(data):
     plt.show()
     
 def flux_train_val_test(data):
+    """
+    Plot the time series of target, highlighting train, validation and test periods
+    """
     fig, axs = plt.subplots(1, 1, sharex = True, gridspec_kw={'hspace': 0, 'wspace': 0.05}) #row, col
     fig.set_figwidth(8) 
     fig.set_figheight(5) 
@@ -236,7 +236,41 @@ def flux_train_val_test(data):
 
     plt.show()
     
+# =============
+# MODEL RESULTS AND VISUALIZATION
+
+def predictions_n_days_r2():
+    """
+    Plot R^2 scores for each day of prediction across different models
+    """
+    
+    plt.scatter(np.arange(1, len(pe)+1), [0.89, 0.71, 0.53], label = f'LSTM        0.89, 0.71, 0.53', color = 'green')
+    plt.plot(np.arange(1, len(pe)+1), [0.89, 0.71, 0.53], color = 'green', linestyle = '--')
+    plt.scatter(np.arange(1, len(pe)+1), [0.86, 0.69, 0.52], label = f'CatBoost  0.86, 0.69, 0.52', color = 'dodgerblue')
+    plt.plot(np.arange(1, len(pe)+1), [0.86, 0.69, 0.52], color = 'dodgerblue')
+    plt.scatter(np.arange(1, len(pe)+1), [0.85, 0.68, 0.50], label = f'LightGBM 0.85, 0.68, 0.50', color = 'orange')
+    plt.plot(np.arange(1, len(pe)+1), [0.85, 0.68, 0.50], color = 'orange')
+    plt.scatter(np.arange(1, len(pe)+1), [0.83, 0.64, 0.46], label = f'XGBoost   0.83, 0.64, 0.46', color = 'darkred')
+    plt.plot(np.arange(1, len(pe)+1), [0.83, 0.64, 0.46], color = 'darkred')
+
+    # plt.scatter(np.arange(1, len(pe)+1), pe, label = f'{pe[0]:.2f}, {pe[1]:.2f}, {pe[2]:.2f}')
+    # plt.plot(np.arange(1, len(pe)+1), pe)
+    
+    # plt.yticks(np.arange(0.45, 0.95, 0.1))
+    plt.xticks(np.arange(1, 4))
+    plt.xlabel('День прогнозирования')
+    plt.ylabel('R²')
+    # plt.title('')
+    plt.legend(loc = 'upper right', fontsize = 11)
+    # plt.savefig('/Users/clemence/Documents/Аспирантура_наука/1. Работа/2. Нейронные сети/NeuralNetwork/Figures/Article_presentation/r2.png', dpi = 600, bbox_inches = 'tight')
+    plt.show()
+    
+    
 def fig_feature_importance(model):
+     """
+     Show the top 10 features based on importance for each prediction day
+     """
+    
     all_names, all_percent = [], []
     for i, estimator in enumerate(model.estimators_):
         feature_importances = estimator.get_feature_importance()
@@ -278,75 +312,12 @@ def fig_feature_importance(model):
     # plt.savefig('/Users/clemence/Documents/Аспирантура_наука/1. Работа/2. Нейронные сети/NeuralNetwork/Figures/Models/ML_model/feature_importance.png', dpi = 600, bbox_inches = 'tight')
 
     plt.show()
-    
-    
-def fig_predicted_VS_real(future_predictions, y_test, pe):
-    fig, axs = plt.subplots(3, 1, sharex='col', sharey='row', gridspec_kw={'hspace': 0, 'wspace': 0.05}) #row, col
-    fig.set_figwidth(10) 
-    fig.set_figheight(8) 
 
-    (ax1), (ax2), (ax3) = axs
-
-    ax1.plot(y_test.index, future_predictions[0], color = 'green', linewidth = 1)
-    ax1.plot(y_test.index, y_test['target_day_1'], color = 'black', linewidth = 1, label = 'True')
-
-    ax2.plot(y_test.index, future_predictions[1], color = 'orange', linewidth = 1)
-    ax2.plot(y_test.index, y_test['target_day_2'], color = 'black', linewidth = 1)
-
-    ax3.plot(y_test.index, future_predictions[2], color = 'red', linewidth = 1)
-    ax3.plot(y_test.index, y_test['target_day_3'], color = 'black', linewidth = 1)
-
-    label = ax1.set_ylabel('$log_{10}$ Electron flux')
-    ax1.yaxis.set_label_coords(-0.1, -0.5)
-    ax1.set_xlim(y_test.index[0], y_test.index[-1])
-    ax1.set_title('Actual and predicted values')
-    ax1.legend(loc = 'upper left')
-    
-    ax1.text(datestr2num('2020-01-20'), 9., 'Day 1', color = 'green')
-    ax2.text(datestr2num('2020-01-20'), 9., 'Day 2', color = 'orange')
-    ax3.text(datestr2num('2020-01-20'), 9., 'Day 3', color = 'red')
-
-    fig.autofmt_xdate(rotation=45)
-    # plt.savefig('/Users/clemence/Documents/Аспирантура_наука/1. Работа/2. Нейронные сети/NeuralNetwork/Figures/Models/ML_model/true_VS_pred_in_time.png', dpi = 600, bbox_inches = 'tight')
-    plt.show()
-    
-def corr_pred_true(future_predictions, y_test, pe):
-    fig, axs = plt.subplots(3, 1, sharex='col', sharey='row', gridspec_kw={'hspace': 0, 'wspace': 0.05}) #row, col
-    fig.set_figwidth(4) 
-    fig.set_figheight(10) 
-
-    (ax1), (ax2), (ax3) = axs
-
-    ax1.scatter(future_predictions[0], y_test['target_day_1'], color = 'green', s = 10, label = 'Day 1')
-    ax1.plot(np.arange(4, 12, 1), np.arange(4, 12, 1), color = 'black', linewidth = 2)
-
-    ax2.scatter(future_predictions[1], y_test['target_day_2'], color = 'orange', s = 10, label = 'Day 2')
-    ax2.plot(np.arange(4, 12, 1), np.arange(4, 12, 1), color = 'black', linewidth = 2)
-
-    ax3.scatter(future_predictions[2], y_test['target_day_3'], color = 'red', s = 10, label = 'Day 3')
-    ax3.plot(np.arange(4, 12, 1), np.arange(4, 12, 1), color = 'black', linewidth = 2)
-
-    label = ax1.set_ylabel('Measured $log_{10}$ electron flux')
-    ax1.yaxis.set_label_coords(-0.15, -0.5)
-
-    ax1.set_title('Actual VS predicted values', fontsize = 19)
-    ax1.legend(loc='lower right')
-    ax2.legend(loc='lower right')
-    ax3.legend(loc='lower right')
-
-    ax1.set_ylim(4, 10.5)
-    ax2.set_ylim(4, 10.5)
-    ax3.set_ylim(4, 10.5)
-    
-    ax1.set_xlim(4., 10.5)
-    ax1.set_xticks(ticks = np.arange(4, 11, 2))
-
-    ax3.set_xlabel('Predicted $log_{10}$ electron flux')
-    # plt.savefig('/Users/clemence/Documents/Аспирантура_наука/1. Работа/2. Нейронные сети/NeuralNetwork/Figures/Models/ML_model/true_VS_pred_in_corr.png', dpi = 600, bbox_inches = 'tight')
-    plt.show()
-    
-        
 def shap_plot(model):
+    """
+    Visualize feature importance for each day using SHAP values
+    """
+    
     explanations = []
     for i, estimator in enumerate(model.estimators_):
         explainer = shap.TreeExplainer(estimator)
@@ -393,6 +364,77 @@ def shap_plot(model):
         # plt.savefig(f'/Users/clemence/Documents/Аспирантура_наука/1. Работа/2. Нейронные сети/NeuralNetwork/Figures/Models/ML_model/shap/violon_{i+1}.png', dpi = 600, bbox_inches = 'tight')
 
         plt.show()
+    
+def fig_predicted_VS_real(future_predictions, y_test, pe):
+    """
+    Plot the time series of predicted and actual target values
+    """
+    fig, axs = plt.subplots(3, 1, sharex='col', sharey='row', gridspec_kw={'hspace': 0, 'wspace': 0.05}) #row, col
+    fig.set_figwidth(10) 
+    fig.set_figheight(8) 
+
+    (ax1), (ax2), (ax3) = axs
+
+    ax1.plot(y_test.index, future_predictions[0], color = 'green', linewidth = 1)
+    ax1.plot(y_test.index, y_test['target_day_1'], color = 'black', linewidth = 1, label = 'True')
+
+    ax2.plot(y_test.index, future_predictions[1], color = 'orange', linewidth = 1)
+    ax2.plot(y_test.index, y_test['target_day_2'], color = 'black', linewidth = 1)
+
+    ax3.plot(y_test.index, future_predictions[2], color = 'red', linewidth = 1)
+    ax3.plot(y_test.index, y_test['target_day_3'], color = 'black', linewidth = 1)
+
+    label = ax1.set_ylabel('$log_{10}$ Electron flux')
+    ax1.yaxis.set_label_coords(-0.1, -0.5)
+    ax1.set_xlim(y_test.index[0], y_test.index[-1])
+    ax1.set_title('Actual and predicted values')
+    ax1.legend(loc = 'upper left')
+    
+    ax1.text(datestr2num('2020-01-20'), 9., 'Day 1', color = 'green')
+    ax2.text(datestr2num('2020-01-20'), 9., 'Day 2', color = 'orange')
+    ax3.text(datestr2num('2020-01-20'), 9., 'Day 3', color = 'red')
+
+    fig.autofmt_xdate(rotation=45)
+    # plt.savefig('/Users/clemence/Documents/Аспирантура_наука/1. Работа/2. Нейронные сети/NeuralNetwork/Figures/Models/ML_model/true_VS_pred_in_time.png', dpi = 600, bbox_inches = 'tight')
+    plt.show()
+    
+def corr_pred_true(future_predictions, y_test, pe):
+    """
+    Plot predicted VS measured target values for a direct comparison
+    """ 
+    fig, axs = plt.subplots(3, 1, sharex='col', sharey='row', gridspec_kw={'hspace': 0, 'wspace': 0.05}) #row, col
+    fig.set_figwidth(4) 
+    fig.set_figheight(10) 
+
+    (ax1), (ax2), (ax3) = axs
+
+    ax1.scatter(future_predictions[0], y_test['target_day_1'], color = 'green', s = 10, label = 'Day 1')
+    ax1.plot(np.arange(4, 12, 1), np.arange(4, 12, 1), color = 'black', linewidth = 2)
+
+    ax2.scatter(future_predictions[1], y_test['target_day_2'], color = 'orange', s = 10, label = 'Day 2')
+    ax2.plot(np.arange(4, 12, 1), np.arange(4, 12, 1), color = 'black', linewidth = 2)
+
+    ax3.scatter(future_predictions[2], y_test['target_day_3'], color = 'red', s = 10, label = 'Day 3')
+    ax3.plot(np.arange(4, 12, 1), np.arange(4, 12, 1), color = 'black', linewidth = 2)
+
+    label = ax1.set_ylabel('Measured $log_{10}$ electron flux')
+    ax1.yaxis.set_label_coords(-0.15, -0.5)
+
+    ax1.set_title('Actual VS predicted values', fontsize = 19)
+    ax1.legend(loc='lower right')
+    ax2.legend(loc='lower right')
+    ax3.legend(loc='lower right')
+
+    ax1.set_ylim(4, 10.5)
+    ax2.set_ylim(4, 10.5)
+    ax3.set_ylim(4, 10.5)
+    
+    ax1.set_xlim(4., 10.5)
+    ax1.set_xticks(ticks = np.arange(4, 11, 2))
+
+    ax3.set_xlabel('Predicted $log_{10}$ electron flux')
+    # plt.savefig('/Users/clemence/Documents/Аспирантура_наука/1. Работа/2. Нейронные сети/NeuralNetwork/Figures/Models/ML_model/true_VS_pred_in_corr.png', dpi = 600, bbox_inches = 'tight')
+    plt.show()
 
 # def plot_training_history(history):
 #     # Loss
@@ -409,24 +451,22 @@ def shap_plot(model):
     
 
     
-# ================= 
+# =================
+OPEN THE DATASET AND PROCESSING
 # ================= 
 
 dirname = '/Users/clemence/Documents/Аспирантура_наука/1. Работа/2. Нейронные сети/NeuralNetwork/data/Processed/'
-
-# =========== 
-
 data = pd.read_csv(dirname + 'dataset_final.csv')
 
 # =========== 
+# Processing
 
 predicted_results = predictions(data)
 future_predictions, pe, y_test, index, model, history, x_test = predicted_results[0], predicted_results[1], predicted_results[2],  predicted_results[3], predicted_results[4], predicted_results[5], predicted_results[6]
 
 # =========== 
-# =========== 
-
 # PLOT THE RESULT
+# =========== 
 
 plt.rcParams.update({'font.size': 20, 'axes.grid': True, 'xtick.direction': 'in', 'ytick.direction': 'in'})
 
@@ -443,19 +483,4 @@ plt.rcParams.update({'font.size': 20, 'axes.grid': True, 'xtick.direction': 'in'
 # corr_pred_true(future_predictions, y_test, pe) #Measured VS Predicted
 
 shap_plot(model)
-
-# n1, n2 = 200, 400
-# data_plot_intro = data.copy()
-# data_plot_intro.set_index(pd.to_datetime(data_plot_intro['time']), inplace = True)
-# plt.plot(data_plot_intro['flux'].index[n1:n2], data_plot_intro['flux'][n1:n2])
-# ticks = pd.date_range(start=data_plot_intro.index[n1], end=data_plot_intro.index[n2], freq='MS') 
-# plt.xticks(ticks, [t.strftime('%Y-%m') for t in ticks], rotation=30)
-# plt.ylim(4.5, 10)
-# plt.xlim(data_plot_intro.index[n1], data_plot_intro.index[n2])
-# plt.ylabel('$log_{10}(J_{el > 2 МэВ})$')
-# plt.xlabel('Год')
-# # plt.savefig(f'/Users/clemence/Documents/Аспирантура_наука/1. Работа/2. Нейронные сети/NeuralNetwork/Figures/Article_presentation/flux_intro_{n1}.{n2}.png', dpi = 600, bbox_inches = 'tight')
-# plt.show()
-
-
 

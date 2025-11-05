@@ -1,17 +1,14 @@
 import pandas as pd
 from sklearn.model_selection import train_test_split
-from sklearn.metrics import r2_score, mean_squared_error
+from sklearn.metrics import r2_score
 import matplotlib.pyplot as plt
-from catboost import CatBoostRegressor
 import numpy as np
 import tensorflow as tf
-import shap
 from tensorflow.keras.models import Sequential, Model
 from tensorflow.keras.layers import InputLayer, GRU, Dense, Dropout, LSTM, BatchNormalization, Bidirectional, MaxPooling1D, Input, MaxPooling2D
 from tensorflow.keras.callbacks import EarlyStopping
 from tensorflow.keras.optimizers import Adam
 from sklearn.preprocessing import MinMaxScaler, StandardScaler, RobustScaler, MaxAbsScaler, QuantileTransformer, PowerTransformer
-from statsmodels.tsa.seasonal import seasonal_decompose
 import random
 import os
 from matplotlib.dates import (
@@ -29,6 +26,27 @@ def set_seed(seed=42):
 set_seed(42)
 
 def create_sequences_multi(x, y, time_steps):
+    """
+    Creates sequences of input data and corresponding target values for time series modeling, 
+    using sliding window approach with the specified time steps.
+
+    Parameters
+    ----------
+    x: pd.DataFrame
+       Dataframe with input parameters
+    y: pd.DataFrame
+       Dataframe with the target values for each prediction days
+    time_steps: int
+                Number of step ahead
+
+    Returns
+    -------
+    np.array(X_seq): ndarray
+                     Sequential input parameters (3D array of shape [n_samples, time_steps, n_features])
+    np.array(y_seq): ndarray
+                     Sequential target value (2D array of shape [n_samples, time_steps])
+    """
+    
     X_seq, y_seq = [], []
     for i in range(len(x) - time_steps):
         X_seq.append(x.iloc[i:i+time_steps].values)
@@ -37,6 +55,39 @@ def create_sequences_multi(x, y, time_steps):
 
 
 def predictions(data):
+    """
+    Script for training neural network model, structured into the following steps: 
+    - Data preparation 
+    - Data splitting (train, validation, test)
+    - Data scaling 
+    - Create sequences
+    - Model defintion
+    - Training
+    - Save the model
+    - Prediction
+    - Evaluation
+    
+    Parameters
+    -----------
+    data: pd.DataFrame 
+          DataFrame containing all parameters with daily resolution to be processed.
+
+    Returns
+    -------
+    pd.DataFrame(y_pred) : pd.DataFrame
+                           DataFrame of predicted values of the test set for each prediction day
+    pe_all : list of float
+             List of prediction efficiency (R^2) values for each prediction day
+    y_test_raw : pd.DataFrame
+             DataFrame of test target values for each day before standardization
+    test_index : pd.datetime
+                 DataFrame of date used to compare the measured and predicted values
+    model : sklearn.multioutput.MultiOutputRegressor
+            Return the model characteristics
+    history : list of float
+                Return the loss and RMSE values for training and validation
+    """
+    # ======= Data preparation =======
     data = data.copy()
     data['time'] = pd.to_datetime(data['time'].str.slice(0, 10))
     data.set_index('time', inplace=True)
@@ -57,8 +108,7 @@ def predictions(data):
     
     time_steps = 2
     
-    # ======= Explicit train/val/test split =======
-    # 80% train+val, 20% test first
+    # ======= Data splitting =======
     x_train_raw, x_valtest_raw, y_train_raw, y_valtest_raw = train_test_split(
         x, y, test_size=0.3, shuffle=False)
         
@@ -93,7 +143,7 @@ def predictions(data):
     y_train_seq = [y_train_seq[:, i] for i in range(3)]
     y_val_seq = [y_val_seq[:, i] for i in range(3)]
     
-    # ======= Build model (same as before) =======
+    # ======= Model definition =======
     inputs = Input(shape=(time_steps, x_train_raw.shape[1]))
     
     x = LSTM(20, activation='tanh', return_sequences=True)(inputs)
@@ -118,7 +168,7 @@ def predictions(data):
         min_delta=0.0001
     )
     
-    # ======= Fit model with explicit validation data =======
+    # ======= Training =======
     history = model.fit(
         x_train_seq, y_train_seq,
         validation_data=(x_val_seq, y_val_seq),
@@ -127,10 +177,11 @@ def predictions(data):
         verbose=0,
         callbacks=[early_stopping]
     )
-    
+
+    # ======= Save the model =======
     # model.save('/Users/clemence/Documents/Аспирантура_наука/1. Работа/2. Нейронные сети/NeuralNetwork/data/model_NN/my_model.keras')
         
-    # ======= Predict on test =======
+    # ======= Prediction =======
     y_pred_scaled = model.predict(x_test_seq, verbose=0)
     y_pred_scaled_stacked = np.hstack(y_pred_scaled)  # shape (samples, 3)
     
@@ -139,7 +190,8 @@ def predictions(data):
     
     y_pred = scaler_y.inverse_transform(y_pred_scaled_stacked)
     y_true = scaler_y.inverse_transform(y_test_scaled_aligned)
-    
+
+    # ======= Evaluation =======
     pe_all = []
     for h in range(3):
         pe_all.append(r2_score(y_test_raw.iloc[time_steps:, h], y_pred[:, h]))
@@ -162,6 +214,9 @@ def predictions(data):
 # PLOT THE RESULTS
 
 def predictions_n_days_r2():
+    """
+    Plot R^2 scores for each day of prediction across different models
+    """
     plt.scatter(np.arange(1, len(pe)+1), pe, label = f'{pe[0]:.2f}, {pe[1]:.2f}, {pe[2]:.2f}')
     plt.plot(np.arange(1, len(pe)+1), pe)
     plt.yticks(np.arange(0.5, 0.95, 0.1))
@@ -175,6 +230,9 @@ def predictions_n_days_r2():
     
 
 def fig_predicted_VS_real(future_predictions, y_test, pe):
+    """
+    Plot the time series of predicted and actual target values
+    """
     fig, axs = plt.subplots(3, 1, sharex='col', sharey='row', gridspec_kw={'hspace': 0, 'wspace': 0.05}) #row, col
     fig.set_figwidth(10) 
     fig.set_figheight(8) 
@@ -207,6 +265,9 @@ def fig_predicted_VS_real(future_predictions, y_test, pe):
     plt.show()
     
 def corr_pred_true(future_predictions, y_test, pe):
+    """
+    Plot predicted VS measured target values for a direct comparison
+    """ 
     fig, axs = plt.subplots(3, 1, sharex='col', sharey='row', gridspec_kw={'hspace': 0, 'wspace': 0.05}) #row, col
     fig.set_figwidth(5) 
     fig.set_figheight(10) 
@@ -248,6 +309,9 @@ def corr_pred_true(future_predictions, y_test, pe):
     
     
 def plot_training_history(history):
+    """
+    Plot the loss and RMSE curves for training and validation
+    """ 
     # Loss
     plt.figure(figsize=(12, 4))
     plt.subplot(1, 2, 1)
@@ -303,12 +367,5 @@ predictions_n_days_r2() #R^2
 
 # plot_training_history(history) #Loss and RMSE curves for train and val
 
-aa = y_test['target_day_1'].iloc[2:]-future_predictions[:,0]
-plt.scatter(y_test['target_day_1'].iloc[2:], aa)
-plt.axhline(y = 0, xmin = 0, xmax = 1, color = 'black')
-plt.show()
-
-plt.hist(aa)
-plt.show()
 
 

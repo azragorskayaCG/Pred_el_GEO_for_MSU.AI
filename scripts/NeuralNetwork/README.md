@@ -8,7 +8,7 @@ The main function `predictions` performs the following steps:
 - *data splitting*: divide dataset into training, validation and test sets
 - *scaling*: standardize data
 - *create sequences*: create sequences of input data using the function `create_sequences_multi`
-- *model defintion*: define the model and select the algorithm (CatBoost, XGBoost, LightGBM)
+- *model defintion*: define the model (type, layers, neurons...)
 - *training*: train the model and predict the results
 - *save the model*: save the model weigths
 - *prediction*: predict the results

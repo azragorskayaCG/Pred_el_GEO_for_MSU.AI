@@ -3,7 +3,6 @@ This folder contains the script `NN_models.py` for training neural network model
 The function `create_sequences_multi` creates sequences of input data and corresponding target values for time series modeling, using sliding window approach with the specified time steps.
 
 The main function `predictions` performs the following steps:
-
 - *data preparation*: create input features and target variables
 - *data splitting*: divide dataset into training, validation and test sets
 - *scaling*: standardize data

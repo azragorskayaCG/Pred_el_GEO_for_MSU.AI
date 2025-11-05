@@ -10,8 +10,17 @@ warnings.filterwarnings("ignore", message="Mean of empty slice")
 
 
 class Preprocessing():
-    
     def __init__(self, directory_path, columns_name):
+        """
+        Creates new dataset class object.
+
+        Parameters
+        ----------
+        directory_path : str
+                        Name of the directory with all files
+        columns_name : str
+                       Name of the column names
+        """ 
         self.directory_path = directory_path
         self.columns_name = columns_name
         self._data_day = None
@@ -19,7 +28,16 @@ class Preprocessing():
         self._data_imputed = None
         
     def mini_files_to_big(self):
-    
+        """
+        Combine all files of the directory into a single dataset.
+        
+        Returns
+        -------
+        df_full : pd.DataFrame
+                  Dataframe of combined files of the directory
+        
+        """ 
+        
         file_names = sorted(f for f in os.listdir(self.directory_path) if f.endswith('.csv'))
         dfs = [pd.read_csv(os.path.join(self.directory_path, file), header=None, sep=',') for file in file_names]
         df = pd.concat(dfs, ignore_index = True)
@@ -41,6 +59,16 @@ class Preprocessing():
 
   
     def pre_calculations(self):
+        """
+        Convert hourly data to daily resolution
+
+        Returns
+        -------
+        data_day : pd.DataFrame
+                   Dataframe with converted data to daily resolution
+        time : pd.datetime
+               Date for each row: year, month, day
+        """
         
         # == Open file
         
@@ -82,6 +110,16 @@ class Preprocessing():
         return data_day, time
   
     def interpolate_fewer_than_n(self, n=3):
+        """
+        Fill missing values using linear interpolation when missing segment is shorter than 3 days
+
+        Returns
+        -------
+        df : pd.DataFrame
+             DataFrame with filled missing values using linear interpolation
+        
+        """
+        
         df_interp = self.pre_calculations()[0].copy()
         df = df_interp.interpolate(method='linear', limit=n, limit_direction='both')
      
@@ -89,7 +127,16 @@ class Preprocessing():
     
     
     def predict_more_than_n(self):
-     
+        """
+        Fill missing values using InterativeImputer when missing segments are longer than 3 days
+
+        Returns
+        -------
+        data_imputed : pd.DataFrame
+             DataFrame with filled missing values using InterativeImputer
+        
+        """
+        
         data = self.interpolate_fewer_than_n()
         
         data_train = data.copy()[:int(len(data)*0.8)] #Divide into train data

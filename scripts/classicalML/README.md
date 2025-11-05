@@ -1,4 +1,4 @@
-This folder contains the script for training classical machine learning models and visualizing results.
+This folder contains the script `ML_models.py` for training classical machine learning models and visualizing results.
 
 The main function `predictions` performs the following steps:
 

@@ -41,7 +41,8 @@ def predictions(data):
     
     Parameters
     -----------
-    data: pd.DataFrame containing all parameters with daily resolution.
+    data: pd.DataFrame 
+          DataFrame containing all parameters with daily resolution to be processed.
     """
     
     #Data preparation

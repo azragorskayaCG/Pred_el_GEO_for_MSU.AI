@@ -43,6 +43,24 @@ def predictions(data):
     -----------
     data: pd.DataFrame 
           DataFrame containing all parameters with daily resolution to be processed.
+
+    Returns
+    -------
+    pd.DataFrame(y_pred) : pd.DataFrame
+                           DataFrame of predicted values of the test set for each prediction day
+    pe_all : list of float
+             List of prediction efficiency (R^2) values for each prediction day
+    y_test : pd.DataFrame
+             DataFrame of test target values for each day
+    test_index : pd.datetime
+                 DataFrame of date used to compare the measured and predicted values
+    model : sklearn.multioutput.MultiOutputRegressor
+            Return the model characteristics
+    histories : empty list
+                Filled by the loss values during traning if necessary
+    x_test : pd.DataFrame
+             DataFrame of test input values for each day
+    
     """
     
     #Data preparation

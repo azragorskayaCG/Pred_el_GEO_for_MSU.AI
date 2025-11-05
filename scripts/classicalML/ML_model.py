@@ -1,16 +1,9 @@
 import pandas as pd
 from sklearn.model_selection import train_test_split
-from sklearn.metrics import r2_score, mean_squared_error
+from sklearn.metrics import r2_score
 import matplotlib.pyplot as plt
 from catboost import CatBoostRegressor
 import numpy as np
-import tensorflow as tf
-from tensorflow.keras.models import Sequential, Model
-from tensorflow.keras.layers import InputLayer, GRU, Dense, Dropout, LSTM, BatchNormalization, Bidirectional, MaxPooling1D, Input, MaxPooling2D
-from tensorflow.keras.callbacks import EarlyStopping
-from tensorflow.keras.optimizers import Adam
-from sklearn.preprocessing import MinMaxScaler, StandardScaler, RobustScaler, MaxAbsScaler, QuantileTransformer, PowerTransformer
-from statsmodels.tsa.seasonal import seasonal_decompose
 import random
 import os
 from matplotlib.dates import (

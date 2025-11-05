@@ -11,4 +11,4 @@ The `Preprocessing` class has functions for preprocessing all files within a dir
 
 ## `Main.py`
 
-Return the preprocessed files for all folders, and concatenates them into single dataset file, and saves the result. 
+Return the preprocessed files for all folders, concatenates them into single dataset file, and saves the result. 

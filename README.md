@@ -1,7 +1,7 @@
 # General info
 As part of the MSU.AI course (2025), a model predicting daily fluxes of relativistic electrons > 2 MeV at geostationary orbit with machine learning methods was developped.
 
-The versions of the imported modules are available in the [requirements.txt](https://github.com/azragorskayaCG/requirements) file.
+The versions of the imported modules are available in the [requirements.txt](https://github.com/azragorskayaCG/Pred_el_GEO_for_MSU.AI/tree/main/requirements.txt) file.
 
 ## Data
 
